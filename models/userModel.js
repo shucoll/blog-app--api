@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 
+//TODO - Setup a logout timestamp and make jwt invalid just like with passwordChangedAt.
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail, 'Please provide a valid email'],
     },
+    photo: String,
     isVerified: { type: Boolean, default: false },
     password: {
       type: String,

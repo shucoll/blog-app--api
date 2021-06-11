@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/userModel.js';
 import Blog from '../models/blogModel.js';
+import Comment from '../models/commentModel.js';
 
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -309,10 +310,12 @@ export const restrictTo =
     next();
   };
 
+//TODO - allow admins - by taking argument
 export const restrictToSelf = (model) =>
   catchAsync(async (req, res, next) => {
     let Model;
     if (model === 'blog') Model = Blog;
+    if (model === 'comment') Model = Comment;
 
     const doc = await Model.findById(req.params.id);
     if (!doc.user.equals(req.user._id)) {

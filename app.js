@@ -16,6 +16,7 @@ import globalErrorHandler from './controllers/errorController.js';
 //import routes here
 import blogRouter from './routes/blogRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import commentRouter from './routes/commentRoutes.js';
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! Shutting down...');
@@ -55,6 +56,7 @@ app.use(hpp());
 //Define the routes here
 app.use('/api/v1/blogs', blogRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/comments', commentRouter);
 
 //not available routes
 app.all('*', (req, res, next) => {

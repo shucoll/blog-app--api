@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
-const noteSchema = new mongoose.Schema(
+const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: [true, 'Must have title'],
     },
-    data: {
+    blogData: {
       time: {
         type: Date,
         required: [true, 'Must have time!'],
@@ -25,9 +25,18 @@ const noteSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-const Blog = mongoose.model('Blog', noteSchema);
+blogSchema.virtual('comment', {
+  ref: 'Comment',
+  foreignField: 'blog',
+  localField: '_id',
+  match: { isReply: false },
+});
+
+const Blog = mongoose.model('Blog', blogSchema);
 
 export default Blog;
