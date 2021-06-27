@@ -1,12 +1,17 @@
+import path from 'path';
+
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 import express from 'express';
+import helmet from 'helmet';
 import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 
 import mongoSanitize from 'express-mongo-sanitize';
-import xss from 'xss-clean';
+// import xss from 'xss-clean';
 import hpp from 'hpp';
+import compression from 'compression';
 
 import cors from 'cors';
 
@@ -17,6 +22,11 @@ import globalErrorHandler from './controllers/errorController.js';
 import blogRouter from './routes/blogRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! Shutting down...');
@@ -40,18 +50,36 @@ mongoose
 const app = express();
 
 app.use(cors());
+// app.use(cors({
+//   origin: `${process.env.CLIENT_URL}`
+// }))
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(helmet());
+
+if (process.env.NODE_ENV === 'production') {
+  const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, please try again in an hour!',
+  });
+  app.use('/api', limiter);
+}
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50kb' }));
 
 app.use(mongoSanitize());
 
-app.use(xss());
+// app.use(xss());
 
 app.use(hpp());
+
+app.use(compression());
 
 //Define the routes here
 app.use('/api/v1/blogs', blogRouter);

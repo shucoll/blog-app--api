@@ -29,9 +29,7 @@ export const updateOne = (Model) =>
 
     res.status(200).json({
       status: 'success',
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 
@@ -41,9 +39,7 @@ export const createOne = (Model) =>
 
     res.status(201).json({
       status: 'success',
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 
@@ -60,9 +56,7 @@ export const getOne = (Model, popOptions) =>
 
     res.status(200).json({
       status: 'success',
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 
@@ -71,8 +65,7 @@ export const getAll = (Model) =>
     const basicFeatures = new APIFeatures(Model.find(), req.query)
       .filter()
       .sort()
-      .limitFields()
-      .paginate();
+      .limitFields();
 
     const totalDoc = await basicFeatures.query;
 
@@ -84,8 +77,6 @@ export const getAll = (Model) =>
       status: 'success',
       totalResults: totalDoc.length,
       results: doc.length,
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });

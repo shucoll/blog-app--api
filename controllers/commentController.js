@@ -22,6 +22,20 @@ export const filterUpdate = (req, res, next) => {
   next();
 };
 
+export const setBlogId = catchAsync(async (req, res, next) => {
+  if (req.params.blogId) {
+    const blog = await Blog.findById(req.params.blogId);
+
+    if (!blog) {
+      return next(new AppError('No blog found with that ID', 404));
+    }
+    req.query.blog = req.params.blogId;
+    req.query.isReply = false;
+  }
+
+  next();
+});
+
 export const setBlogUserIds = catchAsync(async (req, res, next) => {
   const blog = await Blog.findById(req.params.blogId);
 

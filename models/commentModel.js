@@ -6,15 +6,10 @@ const commentSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Comment can not be empty!'],
     },
-    upVotes: {
-      type: Number,
-      default: 0,
-    },
     isReply: {
       type: Boolean,
       default: false,
     },
-
     blog: {
       type: mongoose.Schema.ObjectId,
       ref: 'Blog',
@@ -33,11 +28,17 @@ const commentSchema = new mongoose.Schema(
     },
   },
   {
-    timeStamp: true,
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+
+commentSchema.virtual('reply', {
+  ref: 'Comment',
+  foreignField: 'parentComment',
+  localField: '_id',
+});
 
 commentSchema.pre(/^find/, function (next) {
   this.populate({
@@ -45,12 +46,6 @@ commentSchema.pre(/^find/, function (next) {
     select: 'name photo',
   });
   next();
-});
-
-commentSchema.virtual('reply', {
-  ref: 'Comment',
-  foreignField: 'parentComment',
-  localField: '_id',
 });
 
 const Comment = mongoose.model('Comment', commentSchema);

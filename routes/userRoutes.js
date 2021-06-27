@@ -20,15 +20,18 @@ router.use(authController.protect);
 
 router.patch('/updateMyPassword', authController.updatePassword);
 
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe
+);
 
 //to let user delete their account. doesn't really deletes the account but only deactivates it
 router.delete('/deleteMe', userController.deleteMe);
 
 //For the user to get their complete info
-router.get('/me', userController.getMe, userController.getUser);
-
-//TODO - route for get all my blogs
+router.get('/me', userController.getMe);
 
 //Restrict all the routes below this middleware to admin only
 router.use(authController.restrictTo('admin'));

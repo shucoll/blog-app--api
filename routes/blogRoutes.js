@@ -13,17 +13,12 @@ router
   .get(blogController.getAllBlogs)
   .post(
     authController.protect,
+    blogController.setUser,
     blogController.filterCreate,
     blogController.createBlog
   );
 
-// router
-//   .route('/my-blogs')
-//   .get(
-//     authController.protect,
-//     blogController.setUser,
-//     blogController.getAllBlogs
-//   );
+router.route('/slug/:slug').get(blogController.getBlogBySlug);
 
 router
   .route('/:id')

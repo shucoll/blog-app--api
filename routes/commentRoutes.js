@@ -4,15 +4,11 @@ import * as authController from '../controllers/authController.js';
 
 const router = express.Router({ mergeParams: true });
 
-// router.use(authController.protect);
-
-//the blogId passed through the blog router to this router is caught here and is used in the post method to create the comment for that particular blog
 router
   .route('/')
-  .get(commentController.getAllComments)
+  .get(commentController.setBlogId, commentController.getAllComments)
   .post(
     authController.protect,
-    authController.restrictTo('user'),
     commentController.setBlogUserIds,
     commentController.createComment
   );
@@ -21,7 +17,6 @@ router
   .route('/reply/:commentId')
   .post(
     authController.protect,
-    authController.restrictTo('user'),
     commentController.setBlogUserIds,
     commentController.setCommentId,
     commentController.filterCreate,
