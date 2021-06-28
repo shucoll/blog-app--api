@@ -25,4 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 .vscode/settings.json
 
+!public/img/users
 public/img/users/*
+!public/img/users/default.jpg
