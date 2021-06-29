@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default: 'default.jpg',
+      // default: 'default.jpg',
     },
     isVerified: { type: Boolean, default: false },
     password: {

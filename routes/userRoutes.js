@@ -2,6 +2,7 @@ import express from 'express';
 
 import * as userController from '../controllers/userController.js';
 import * as authController from '../controllers/authController.js';
+import { multerUpload } from '../utils/multer.js';
 
 const router = express.Router();
 
@@ -22,8 +23,8 @@ router.patch('/updateMyPassword', authController.updatePassword);
 
 router.patch(
   '/updateMe',
+  multerUpload,
   userController.uploadUserPhoto,
-  userController.resizeUserPhoto,
   userController.updateMe
 );
 

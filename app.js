@@ -36,14 +36,13 @@ process.on('uncaughtException', (err) => {
 
 dotenv.config();
 
-let DB;
+let DB = process.env.DATABASE;
 
 if (process.env.NODE_ENV === 'production')
   DB = process.env.DATABASE_PRODUCTION.replace(
     '<PASSWORD>',
     process.env.DATABASE_PASSWORD
   );
-else DB = process.env.DATABASE;
 
 mongoose
   .connect(DB, {

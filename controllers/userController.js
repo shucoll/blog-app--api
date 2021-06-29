@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-import multer from 'multer';
-import sharp from 'sharp';
 import User from '../models/userModel.js';
 import Comment from '../models/commentModel.js';
 import Blog from '../models/blogModel.js';
@@ -8,59 +6,31 @@ import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 import * as factory from './handlerFactory.js';
 import filterObj from '../utils/filterObj.js';
+import cloudinary from '../utils/cloudinary.js';
+import { dataUri } from '../utils/multer.js';
 
-const multerStorage = multer.memoryStorage();
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-});
-
-export const uploadUserPhoto = upload.single('photo');
-
-export const resizeUserPhoto = catchAsync(async (req, res, next) => {
+export const uploadUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `user-${req.user.id}.jpeg`;
+  let uploadPreset = 'dev';
+  if (process.env.NODE_ENV === 'production') uploadPreset = 'prod';
 
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+  req.file.filename = `${uploadPreset}/userProfile/user-${
+    req.user.id
+  }-${Date()}.jpg`;
+
+  const file = dataUri(req).content;
+
+  await cloudinary.uploader.upload(file, {
+    upload_preset: uploadPreset,
+    width: 500,
+    height: 500,
+    format: 'jpeg',
+    crop: 'limit',
+    public_id: `user-${req.user.id}-${Date()}`,
+  });
 
   next();
-});
-
-// export const getMe = (req, res, next) => {
-//   req.params.id = req.user.id;
-//   next();
-// };
-
-export const getMe = catchAsync(async (req, res, next) => {
-  const query = User.findById(req.user.id).select(['-role', '-isVerified']);
-
-  // if (popOptions) query = query.populate(popOptions);
-  const doc = await query;
-
-  const blogCount = await Blog.countDocuments({ user: doc._id });
-
-  if (!doc) {
-    return next(new AppError('No document found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: { ...doc._doc, blogCount: blogCount },
-  });
 });
 
 export const updateMe = catchAsync(async (req, res, next) => {
@@ -86,6 +56,24 @@ export const updateMe = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser,
     },
+  });
+});
+
+export const getMe = catchAsync(async (req, res, next) => {
+  const query = User.findById(req.user.id).select(['-role', '-isVerified']);
+
+  // if (popOptions) query = query.populate(popOptions);
+  const doc = await query;
+
+  const blogCount = await Blog.countDocuments({ user: doc._id });
+
+  if (!doc) {
+    return next(new AppError('No document found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { ...doc._doc, blogCount: blogCount },
   });
 });
 
